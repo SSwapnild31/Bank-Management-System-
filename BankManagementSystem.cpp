@@ -206,6 +206,56 @@ void account_query::edit_rec()
 	}
 }
 
+void account_query::delete_rec()
+{
+	int n;
+	ifstream infile;
+	infile.open("record.bank", ios::binary);
+	if(!infile)
+	{
+		cout<<"Error in Opening! File Not Found!!"<<endl;
+		return;
+	}
+	infile.seekg(0,ios::end);
+	int count = infile.tellg()/sizeof(*this);
+	if(count==0)
+	{
+		cout<<"No Record Available in Bank System\n";
+		cout<<"--------------------------------"<< endl;
+		return ;
+	}
+	cout<<"There are "<<count<<" records in the file\n";
+	cout<<"--------------------------------"<< endl;
+	cout<<"Enter Record Number to Delete : ";
+	cin>>n;
+	cout<<"--------------------------------"<< endl;
+	if(n<=count && n!=0)
+	{
+		fstream tmpfile;
+		tmpfile.open("tmpfile.bank",ios::out|ios::binary);
+		infile.seekg(0);
+		for(int i=0;i<count;i++)
+		{
+			infile.read(reinterpret_cast<char*>(this),sizeof(*this));
+			if(i==(n-1))
+				continue;
+			tmpfile.write(reinterpret_cast<char*>(this),sizeof(*this));
+		}
+		infile.close();
+		tmpfile.close();
+		remove("record.bank");
+		rename("tmpfile.bank", "record.bank");
+		cout<<"\nRecord Deleted Successfully...!!\n";
+		cout<<"--------------------------------"<< endl;
+	}
+	else
+	{
+		cout<<"Enter Correct Record Number\n",search_rec();
+		cout<<"--------------------------------"<< endl;
+	}
+}
+
+
 int main()
 {
 	account_query A;
