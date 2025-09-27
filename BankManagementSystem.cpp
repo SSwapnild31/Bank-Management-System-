@@ -164,6 +164,47 @@ void account_query::search_rec()
 	}
 }
 
+void account_query::edit_rec()
+{
+	int n;
+	fstream iofile;
+	iofile.open("record.bank", ios::in|ios::binary);
+	if(!iofile)
+	{
+		cout<<"Error in Opening! File Not Found!!"<<endl;
+		return;
+	}
+	iofile.seekg(0,ios::end);
+	int count = iofile.tellg()/sizeof(*this);
+	if(count==0)
+	{
+		cout<<"No Record Available in Bank System\n";
+	}
+	else
+	{
+		cout<<"There are "<<count<<" records in the file\n";
+		cout<<"Enter Record Number to Edit : ";
+		cin>>n;
+		if(n<=count && n!=0)
+		{
+			iofile.seekg((n-1)*sizeof(*this));
+			iofile.read(reinterpret_cast<char*>(this),sizeof(*this));
+			cout<<"Record "<<n<<"has following data "<<endl;
+			show_data();
+			iofile.close();
+			iofile.open("record.bank", ios::out|ios::in|ios::binary);
+			iofile.seekg((n-1)*sizeof(*this));
+			cout<<"Enter data to modify\n";
+			read_data();
+			iofile.write(reinterpret_cast<char*>(this),sizeof(*this));
+			cout<<"Record Updated Successfully...!!!\n";
+		}
+		else
+		{
+			cout<<"Enter Correct Record Number\n",search_rec();
+		}
+	}
+}
 
 int main()
 {
